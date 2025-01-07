@@ -1,0 +1,86 @@
+%%
+clc,clear,close all
+data = readmatrix("CSV1.csv");
+figure
+start = 84;
+stop = height(data);
+q = data(start:stop,2);
+t = data(start:stop,1)./10^6;
+dat = [t q];
+dat(any(isnan(dat), 2), :) = [];
+t = dat(:,1);
+q = dat(:,2);
+plot(t,q)
+
+for t = 1:1:284
+end
+
+%%
+clc,clear,close all
+data = readmatrix("CSV1.csv");
+figure
+q = data(:,2);
+t = data(:,1)./10^6;
+dat = [t q];
+dat(any(isnan(dat), 2), :) = [];
+t = dat(:,1);
+q = dat(:,2);
+plot(t,q)
+
+xlabel('Frequency (MHz)'), ylabel('dBm\muV')
+[up,lo] = envelope(q,20,'peak');
+hold on
+plot(t,up,'linewidth',1.5)
+legend('q','up','lo')
+hold off
+
+%%
+clc,clear
+
+figure
+for t = 1:1:9
+    name = append('CSV',int2str(t),'.csv');
+    data = readmatrix(name);
+    q = data(:,2);
+    t = data(:,1)./10^6;
+    dat = [t q];
+    dat(any(isnan(dat), 2), :) = [];
+    t = dat(:,1);
+    q = dat(:,2);
+    [up,lo] = envelope(q,20,'peak');
+    plot(t,up,'linewidth',1.5), hold on
+end
+
+%%
+clc,clear,close all
+
+final = [];
+for t = 1:1:9
+    name = append('CSV',int2str(t),'.csv');
+    data = readmatrix(name);
+    values = [];
+    max = height(data)/2; %15MHz
+    intervall = round(max/15);
+    for t = 84:intervall:max
+        if t+intervall>max
+            values = [values sum(data(t:max,2))/(max-t)];
+        else
+            values = [values sum(data(t:t+intervall,2))/intervall];
+        end
+    end
+    final = [final values'];
+end
+
+final = [final values'];
+
+degr = [1 2 3 4 5 6 7 8 9 10];
+
+stairs(degr,final')
+curtick = get(gca, 'xTick');
+xticks(unique(round(curtick)));
+
+legend('0-1MHz','1-2MHz','2-3MHz','3-4MHz','5-6MHz','6-7MHz','7-8MHz','8-9MHz','9-10MHz', '10-11MHz', '11-12MHz', '12-13MHz', '13-14MHz', '14-15MHz')
+title('Magnetic Field Frequency Power')
+xlabel('Position')
+ylabel('Mean dBm\muV')
+xlim([1 9.9])
