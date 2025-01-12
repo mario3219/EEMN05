@@ -103,7 +103,7 @@ hold off
 %%
 clc,clear
 
-figure
+figure('Renderer', 'painters', 'Position', [10 10 1800 400])
 subplot(1,3,1)
 for t = 1:1:9
     if t == 4
@@ -130,6 +130,7 @@ for t = 1:1:9
     end
     xlabel('Frequency (MHz)')
     ylabel('dBm\muV')
+    ylim([30 150])
 end
 sgtitle('Magnetic Field Frequency Spectrum')
 
